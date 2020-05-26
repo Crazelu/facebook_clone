@@ -1,7 +1,13 @@
+import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/constants/constants.dart';
+import 'package:facebook_clone/screens/loading.dart';
 
 class SignIn extends StatefulWidget {
+
+  final Function toggleView;
+  SignIn({this.toggleView});
+
   @override
   _SignInState createState() => _SignInState();
 }
@@ -9,14 +15,16 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
 
   final _formKey = GlobalKey<FormState>();
-
-  TextEditingController emailController;
-  TextEditingController passwordController;
+  final AuthService _auth = AuthService();
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController= TextEditingController();
+  bool isVisible = false;
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return Material(
+    return isLoading ? Loading() : Material(
       color: Colors.white,
       child: Padding(
         padding: EdgeInsets.only(top: height * .1),
@@ -35,6 +43,7 @@ class _SignInState extends State<SignIn> {
                   fontSize:20
                 )
               ),
+               
               SizedBox(height:20),
               Text(
                 'Connect with friends and stay safe',
@@ -44,15 +53,25 @@ class _SignInState extends State<SignIn> {
                   fontWeight: FontWeight.bold
                 )
               ),
+              SizedBox(height:10),
+              Visibility(
+                      visible: isVisible,
+                      child: Text(
+                        'Invalid email or password',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize:16
+                        )
+                      )
+                    ),
               SizedBox(height:20),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    _textField(emailController, 'Email Address', emailValidator),
+                    _textField(emailController, 'Email Address', emailValidator, false),
                     SizedBox(height:20),
-                    _textField(passwordController, 'Password', passwordValidator),
-
+                    _textField(passwordController, 'Password', passwordValidator, true),
                   ]
                 )
               ),
@@ -62,15 +81,25 @@ class _SignInState extends State<SignIn> {
                 style: TextStyle(
                   color: Colors.grey[400]
                 ),
-              )
+              ),
+              SizedBox(height:40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _button(true, _submit, 'Sign in'),
+                        _button(false, widget.toggleView, 'Register'),
+
+                    ],)
+                    
             ]
           ),
         ),
       ),
     );
   }
-  _textField(TextEditingController controller, String label, Function validator){
+  _textField(TextEditingController controller, String label, Function validator, bool obscure){
     return TextFormField(
+      obscureText: obscure,
       validator: validator,
       controller: controller,
       decoration: decoration.copyWith(
@@ -79,11 +108,44 @@ class _SignInState extends State<SignIn> {
     );
   }
 
-  submit(){
+  _submit() async{
       if(_formKey.currentState.validate()){
-        print('Success');
+        setState(() {
+          isLoading = !isLoading;
+        });
+        isVisible = false;
+        dynamic result =  await _auth.signIn(emailController.text, passwordController.text);
+        if (result == null){
+          setState(() {
+        isVisible = true;
+         isLoading = !isLoading;
+      });
+        }
+        
       }
     }
+
   
+  _button(bool isSignIn, Function pressed, String text){
+    double width = MediaQuery.of(context).size.width;
+    return Container(
+      height: 50,
+      width: isSignIn ? width * .45 : width *.3,
+      child: RaisedButton(
+        color: isSignIn ? Colors.lightBlueAccent : Colors.blueGrey[900],
+        onPressed: pressed,
+        textColor: Colors.white,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16
+          )
+          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        )
+        )
+    );
+  }
 
 }

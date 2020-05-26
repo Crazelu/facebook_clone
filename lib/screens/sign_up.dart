@@ -1,7 +1,13 @@
+import 'package:facebook_clone/screens/loading.dart';
+import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/constants/constants.dart';
 
 class SignUp extends StatefulWidget {
+
+  final Function toggleView;
+  SignUp({this.toggleView});
+
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -9,15 +15,18 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
 
   final _formKey = GlobalKey<FormState>();
+  bool isVisible= false;
+  bool isLoading = false;
+  final AuthService _auth = AuthService();
 
-  TextEditingController emailController;
-  TextEditingController nameController;
-  TextEditingController passwordController;
+  TextEditingController emailController= TextEditingController();
+  TextEditingController nameController= TextEditingController();
+  TextEditingController passwordController= TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
-    return Material(
+    return isLoading ? Loading() : Material(
       color: Colors.white,
       child: Padding(
         padding: EdgeInsets.only(top: height * .1),
@@ -27,6 +36,7 @@ class _SignUpState extends State<SignUp> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+               
               Text(
                 'Facebook',
                 style: TextStyle(
@@ -45,17 +55,28 @@ class _SignUpState extends State<SignUp> {
                   fontWeight: FontWeight.bold
                 )
               ),
+              SizedBox(height:10),
+              Visibility(
+                      visible: isVisible,
+                      child: Text(
+                        'Invalid email',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontSize:16
+                        )
+                      )
+                    ),
+                    
               SizedBox(height:20),
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    _textField(emailController, 'Name', nameValidator),
+                    _textField(nameController, 'Name', nameValidator, false),
                     SizedBox(height:20),
-                    _textField(emailController, 'Email Address', emailValidator),
+                    _textField(emailController, 'Email Address', emailValidator, false),
                     SizedBox(height:20),
-                    _textField(passwordController, 'Password', passwordValidator),
-
+                    _textField(passwordController, 'Password', passwordValidator, true),
                   ]
                 )
               ),
@@ -95,7 +116,16 @@ class _SignUpState extends State<SignUp> {
                   ),
                 ),
                 ]
-              )
+              ),
+              SizedBox(height:40),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _button(false, widget.toggleView, 'Sign in'),
+                        _button(true, _submit, 'Register'),
+
+                    ],),
+                   
             ]
           ),
         ),
@@ -103,8 +133,9 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-    _textField(TextEditingController controller, String label, Function validator){
+    _textField(TextEditingController controller, String label, Function validator, bool obscure){
     return TextFormField(
+      obscureText: obscure,
       validator: validator,
       controller: controller,
       decoration: decoration.copyWith(
@@ -113,10 +144,42 @@ class _SignUpState extends State<SignUp> {
     );
     }
 
-    submit(){
+    _submit() async{
       if(_formKey.currentState.validate()){
-        print('Success');
+        setState(() {
+          isLoading = !isLoading;
+        });
+        dynamic result = await _auth.register(emailController.text, passwordController.text);
+        if (result == null){
+          setState(() {
+        isVisible = true;
+        isLoading = !isLoading;
+      });
+        }
+        
       }
+      
     }
+  _button(bool isSignIn, Function pressed, String text){
+    double width = MediaQuery.of(context).size.width;
+    return Container(
+      height: 50,
+      width: isSignIn ? width * .45 : width *.3,
+      child: RaisedButton(
+        color: isSignIn ? Colors.lightBlueAccent : Colors.blueGrey[900],
+        onPressed: pressed,
+        textColor: Colors.white,
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 16
+          )
+          ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        )
+        )
+    );
+  }
 
 }

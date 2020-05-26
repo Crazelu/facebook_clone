@@ -1,5 +1,6 @@
 import 'package:facebook_clone/models/comment.dart';
 import 'package:facebook_clone/screens/create_post.dart';
+import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/models/post.dart';
 
@@ -9,6 +10,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+  final AuthService _auth = AuthService();
 
   void delay(){
     Future.delayed(Duration(seconds: 5)).then((onValue){
@@ -41,10 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         actions: <Widget>[
           Padding(
-            padding: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(8),
             child: FlatButton(
                 color: Colors.blueGrey[800],
-                onPressed: (){}, 
+                onPressed: (){
+                  _auth.signOut();
+                }, 
                 child: Text(
                   'Clone Mode',
                   style: TextStyle(
@@ -59,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.fromLTRB(20,20,20,0),
+        padding: EdgeInsets.fromLTRB(10,20,10,0),
         child: Container(
           child: Column(
             children: <Widget>[
@@ -68,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   CircleAvatar(
-                    radius: 25,
+                    radius: 22,
                     backgroundColor: Colors.amber
                   ),
                   Container(
@@ -126,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
                CircleAvatar(
-                    radius: 22,
+                    radius: 20,
                     backgroundColor: Colors.amber
                   ),
                   SizedBox(width: 20,),
@@ -157,6 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text(
               post.text,
               maxLines: 3,
+              overflow: TextOverflow.fade,
               )
           ),
           Container(
@@ -204,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                   ),
             ],
-          )
+          ),
         ],
       )
     );
@@ -254,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                    CircleAvatar(
-                        radius: 22,
+                        radius: 20,
                         backgroundColor: Colors.amber
                       ),
                       SizedBox(width: 20,),
@@ -290,6 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       maxLines: 2,
                       softWrap: true,
                       textScaleFactor: 1,
+                      overflow: TextOverflow.fade,
                     )
                   ),
                 ],
