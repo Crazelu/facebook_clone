@@ -18,10 +18,12 @@ class _SignUpState extends State<SignUp> {
   bool isVisible= false;
   bool isLoading = false;
   final AuthService _auth = AuthService();
-
+  
   TextEditingController emailController= TextEditingController();
   TextEditingController nameController= TextEditingController();
   TextEditingController passwordController= TextEditingController();
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -30,103 +32,107 @@ class _SignUpState extends State<SignUp> {
       color: Colors.white,
       child: Padding(
         padding: EdgeInsets.only(top: height * .1),
-        child: Container(
-          color: Colors.white,
-          margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-               
-              Text(
-                'Facebook',
-                style: TextStyle(
-                  letterSpacing: 0.5,
-                  color: Colors.indigoAccent,
-                  fontWeight: FontWeight.bold,
-                  fontSize:20
-                )
-              ),
-              SizedBox(height:20),
-              Text(
-                'Connect with friends and stay safe',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold
-                )
-              ),
-              SizedBox(height:10),
-              Visibility(
-                      visible: isVisible,
-                      child: Text(
-                        'Invalid email',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize:16
-                        )
-                      )
-                    ),
-                    
-              SizedBox(height:20),
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _textField(nameController, 'Name', nameValidator, false),
-                    SizedBox(height:20),
-                    _textField(emailController, 'Email Address', emailValidator, false),
-                    SizedBox(height:20),
-                    _textField(passwordController, 'Password', passwordValidator, true),
-                  ]
-                )
-              ),
-              SizedBox(height:20),
-              Wrap(
-                children: [
-                  Text(
-                  'By signing up you have accepted the ',
-                  style: TextStyle(
-                    color: Colors.grey[400]
-                  ),
-                ),
-                InkWell(
-                  onTap: (){},
-                  child: Text(
-                    'Terms and',
-                    style: TextStyle(
-                    color: Colors.blue[800],
-                    fontWeight: FontWeight.bold
-                  ),
-                  ),
-                ),
-                InkWell(
-                  onTap: (){},
-                  child: Text(
-                    'conditions ',
-                    style: TextStyle(
-                    color: Colors.blue[800],
-                    fontWeight: FontWeight.bold
-                  ),
-                  ),
-                ),
+        child: SingleChildScrollView(
+          child: Container(
+            color: Colors.white,
+            margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                 
                 Text(
-                  'of this service',
+                  'Facebook',
                   style: TextStyle(
-                    color: Colors.grey[400]
-                  ),
+                    letterSpacing: 0.5,
+                    color: Colors.indigoAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize:20
+                  )
                 ),
-                ]
-              ),
-              SizedBox(height:40),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        _button(false, widget.toggleView, 'Sign in'),
-                        _button(true, _submit, 'Register'),
+                SizedBox(height:20),
+                Text(
+                  'Connect with friends and stay safe',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold
+                  )
+                ),
+                SizedBox(height:10),
+                Visibility(
+                        visible: isVisible,
+                        child: Text(
+                          'Invalid email',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize:16
+                          )
+                        )
+                      ),
+                      
+                SizedBox(height:20),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _textField(nameController, 'Name', nameValidator, false),
+                      SizedBox(height:20),
+                      _textField(emailController, 'Email Address', emailValidator, false),
+                      SizedBox(height:20),
+                      _textField(passwordController, 'Password', passwordValidator, true),
+                    ]
+                  )
+                ),
+                SizedBox(height:20),
+                Wrap(
+                  children: [
+                    Text(
+                    'By signing up you have accepted the ',
+                    style: TextStyle(
+                      color: Colors.grey[400]
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){},
+                    child: Text(
+                      'Terms and',
+                      style: TextStyle(
+                      color: Colors.blue[800],
+                      fontWeight: FontWeight.bold
+                    ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: (){},
+                    child: Text(
+                      'conditions ',
+                      style: TextStyle(
+                      color: Colors.blue[800],
+                      fontWeight: FontWeight.bold
+                    ),
+                    ),
+                  ),
+                  Text(
+                    'of this service',
+                    style: TextStyle(
+                      color: Colors.grey[400]
+                    ),
+                  ),
+                  ]
+                ),
+                SizedBox(height:40),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          _button(false, widget.toggleView, 'Sign in'),
+                          _button(true, _submit, 'Register'),
 
-                    ],),
-                   
-            ]
+                      ],),
+                      SizedBox(height:50),
+                     
+              ]
+            ),
           ),
         ),
       ),
@@ -149,7 +155,7 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           isLoading = !isLoading;
         });
-        dynamic result = await _auth.register(emailController.text, passwordController.text, nameController.text);
+        dynamic result = await _auth.register(emailController.text, passwordController.text, nameController.text, 'none');
         if (result == null){
           setState(() {
         isVisible = true;
@@ -181,5 +187,7 @@ class _SignUpState extends State<SignUp> {
         )
     );
   }
+
+  
 
 }

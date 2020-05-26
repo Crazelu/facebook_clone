@@ -1,6 +1,8 @@
 import 'package:facebook_clone/models/comment.dart';
 import 'package:facebook_clone/models/user.dart';
 import 'package:facebook_clone/screens/create_post.dart';
+import 'package:facebook_clone/screens/post_view.dart';
+import 'package:facebook_clone/screens/profile.dart';
 import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/models/post.dart';
@@ -35,7 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: Icon(Icons.menu), 
+          onPressed: _drawer),
         title: Text(
                 'Facebook',
                 style: TextStyle(
@@ -65,6 +69,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
           )
         ],
+      ),
+      drawer: Drawer(
+        child: _drawer()
       ),
       body: Padding(
         padding: EdgeInsets.fromLTRB(10,20,10,0),
@@ -123,99 +130,104 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _listView(double height, double width, Post post){
-    return Container(
-      color: Colors.white,
-      width: width,
-      height: height*.55,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-               CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.amber
-                  ),
-                  SizedBox(width: 20,),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        post.userName,
-                        style: TextStyle(
-                          fontSize:16,
-                          color: Colors.black
-                        )
-                        ),
-                      Text(
-                        post.time.toString(),
-                        style: TextStyle(
-                          color: Colors.grey
-                        )
-                        ),
-                    ],
-                  )
-            ],
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(vertical:20),
-            width: width,
-            child: Text(
-              post.text,
-              maxLines: 3,
-              overflow: TextOverflow.fade,
+    return InkWell(
+      onTap: (){
+        Navigator.push(context, MaterialPageRoute(builder: (_)=> PostView(post)));
+        },
+      child: Container(
+        color: Colors.white,
+        width: width,
+        height: height*.55,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                 CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.amber
+                    ),
+                    SizedBox(width: 20,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          post.userName,
+                          style: TextStyle(
+                            fontSize:16,
+                            color: Colors.black
+                          )
+                          ),
+                        Text(
+                          post.time.toString(),
+                          style: TextStyle(
+                            color: Colors.grey
+                          )
+                          ),
+                      ],
+                    )
+              ],
+            ),
+            Container(
+              margin: EdgeInsets.symmetric(vertical:20),
+              width: width,
+              child: Text(
+                post.text,
+                maxLines: 3,
+                overflow: TextOverflow.fade,
+                )
+            ),
+            Container(
+              width: width,
+              height: height*.25,
+              decoration: BoxDecoration(
+                color: Colors.pink,
+                borderRadius: BorderRadius.circular(20)
               )
-          ),
-          Container(
-            width: width,
-            height: height*.25,
-            decoration: BoxDecoration(
-              color: Colors.pink,
-              borderRadius: BorderRadius.circular(20)
-            )
 
-          ),
-          SizedBox(height:10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                children: <Widget>[
-                  IconButton(
-                onPressed: (){},
-                icon: Icon(Icons.favorite_border),
-              ),
-              Text('${post.likes} likes'),
-                ],),
-              
-              Container(
-                    width: width *.5,
-                    height: 50,
-                    child: FlatButton(
-                      onPressed: (){
-                        //Implement draggable bottom sheet
-                        _bottomSheet(context, height, width);
-                      },
-                      child: Text(
-                        "Comments",
-                        style: TextStyle(
-                          color: Colors.grey[400]
+            ),
+            SizedBox(height:10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    IconButton(
+                  onPressed: (){},
+                  icon: Icon(Icons.favorite_border),
+                ),
+                Text('${post.likes} likes'),
+                  ],),
+                
+                Container(
+                      width: width *.5,
+                      height: 50,
+                      child: FlatButton(
+                        onPressed: (){
+                          //Implement draggable bottom sheet
+                          _bottomSheet(context, height, width);
+                        },
+                        child: Text(
+                          "Comments",
+                          style: TextStyle(
+                            color: Colors.grey[400]
+                          )
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                          side: BorderSide(
+                            color: Colors.grey
+                          )
+                        ),
                         )
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
-                        side: BorderSide(
-                          color: Colors.grey
-                        )
-                      ),
-                      )
-                  ),
-            ],
-          ),
-        ],
-      )
+                    ),
+              ],
+            ),
+          ],
+        )
+      ),
     );
   }
 
@@ -310,6 +322,49 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }
               ),
+      ),
+    );
+  }
+
+  _drawer() {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
+    return SafeArea(
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical:20, horizontal:20),
+        color: Colors.white24,
+        width: width * .4,
+        height: height,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            InkWell(
+              onTap: (){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> Profile()));
+              },
+              child: Text(
+                'Profile',
+                style: TextStyle(
+                  color: Colors.blue[600],
+                  fontSize:22,
+                  fontWeight: FontWeight.bold
+                )
+              )
+            ),
+            SizedBox(height:20),
+            InkWell(
+              onTap: ()=> _auth.signOut(),
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.blue[600],
+                  fontSize:22,
+                  fontWeight: FontWeight.bold
+                )
+              )
+            ),
+
+          ],)
       ),
     );
   }
