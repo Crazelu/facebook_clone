@@ -8,14 +8,21 @@ import 'home_screen.dart';
 
 class CreatePost extends StatefulWidget {
 
+ final String id;
+  CreatePost({this.id});
+
   @override
   _CreatePostState createState() => _CreatePostState();
 }
 
 class _CreatePostState extends State<CreatePost> {
   final TextEditingController textController = TextEditingController();
+ String _imageUrl;
   File _image;
+  String _downloadUrl;
+  StorageReference _reference;
   final DateTime _time = DateTime.now();
+  bool isUploaded = false;
 
   Future getImage(bool isCamera) async{
     File image;
@@ -27,11 +34,36 @@ class _CreatePostState extends State<CreatePost> {
     }
     setState(() {
       _image = image;
+      _imageUrl = widget.id + _time.toString();
+      uploadToCloud();
+      if (isUploaded){
+        downloadFromCloud();
+      }
+      else{
+        print('Error');
+      }
+    });
+  }
+
+  Future uploadToCloud() async{
+    _reference = FirebaseStorage.instance.ref().child(_imageUrl);
+    StorageUploadTask uploadTask = _reference.putFile(_image);
+    StorageTaskSnapshot snap = await uploadTask.onComplete;
+    setState(() {
+      isUploaded = true;
+    });
+  }
+
+  Future downloadFromCloud() async{
+    String address = await _reference.getDownloadURL();
+    setState(() {
+      _downloadUrl = address;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+     
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -49,6 +81,11 @@ class _CreatePostState extends State<CreatePost> {
             color: Colors.grey,
           onPressed: (){
             if (textController.text.isNotEmpty){
+              //upload image to firebase storage
+
+              //if upload is successful, download image
+
+              //Push data to firebase database
               posts.add(Post(text:textController.text, likes: 0, id:'10', userName: 'Dummy', time: DateTime.now()));
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> HomeScreen()));
             }
@@ -96,7 +133,7 @@ class _CreatePostState extends State<CreatePost> {
                 )
               ],
             ),
-            SizedBox(height:20),
+            SizedBox(height:15),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
@@ -115,7 +152,7 @@ class _CreatePostState extends State<CreatePost> {
               height: height * .4,
               width: width,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(50),
+                borderRadius: BorderRadius.circular(20),
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: FileImage(_image)

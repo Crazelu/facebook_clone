@@ -1,4 +1,5 @@
 import 'package:facebook_clone/models/user.dart';
+import 'package:facebook_clone/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService{
@@ -30,10 +31,11 @@ class AuthService{
   }
 
   //register
-  Future register(String email, String password) async{
+  Future register(String email, String password, String name) async{
     try{
       AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       FirebaseUser user = result.user;
+      UserDatabaseService(id:user.uid).updateUserData(name, 'none');
       return userFromFirebaseUser(user);
     }
     catch (e){

@@ -1,10 +1,13 @@
 import 'package:facebook_clone/models/comment.dart';
+import 'package:facebook_clone/models/user.dart';
 import 'package:facebook_clone/screens/create_post.dart';
 import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/models/post.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -81,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 50,
                     child: FlatButton(
                       onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (_)=> CreatePost()));
+                        Navigator.push(context, MaterialPageRoute(builder: (_)=> CreatePost(id: Provider.of<User>(context).id)));
                       },
                       child: Text(
                         "What's on your mind?",
@@ -245,67 +248,68 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(30,10,10,10),
-        child: ListView.builder(
-          itemCount: comments.length,
-          itemBuilder: (context, index){
-            Comment comment = comments[index];
-            return Container(
-              height:80,
-              width: MediaQuery.of(context).size.width,
-              margin: EdgeInsets.symmetric(vertical:10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                   CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.amber
-                      ),
-                      SizedBox(width: 20,),
-                      Column(
+        child: 
+            ListView.builder(
+              itemCount: comments.length,
+              itemBuilder: (context, index){
+                Comment comment = comments[index];
+                return Container(
+                  height:80,
+                  width: MediaQuery.of(context).size.width,
+                  margin: EdgeInsets.symmetric(vertical:10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            comment.userName,
-                            style: TextStyle(
-                              fontSize:16,
-                              color: Colors.black
-                            )
-                            ),
-                          Text(
-                            comment.time.toString(),
-                            style: TextStyle(
-                              color: Colors.grey
-                            )
-                            ),
-                        ],
-                      )
-                ],
-              ),
-              Row(
-                children: <Widget>[
-                  SizedBox(width: 62,),
-                  Container(
-                    height: 30,
-                    width:MediaQuery.of(context).size.width*.7,
-                    child: Text(
-                      comment.text,
-                      maxLines: 2,
-                      softWrap: true,
-                      textScaleFactor: 1,
-                      overflow: TextOverflow.fade,
-                    )
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                       CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.amber
+                          ),
+                          SizedBox(width: 20,),
+                          Row(
+                            
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                comment.userName,
+                                style: TextStyle(
+                                  fontSize:16,
+                                  color: Colors.black
+                                )
+                                ),
+                                SizedBox(width:10),
+                              Text(
+                                comment.time.toString().substring(0,12),
+                                style: TextStyle(
+                                  color: Colors.grey
+                                )
+                                ),
+                            ],
+                          )
+                    ],
                   ),
-                ],
-              )
-                ],
-              )
-            );
-          }
-          ),
+                  Row(
+                    children: <Widget>[
+                      SizedBox(width: 62,),
+                      Container(
+                        height: 30,
+                        width:MediaQuery.of(context).size.width*.7,
+                        child: Text(
+                          comment.text,
+                          maxLines: 2,
+                          overflow: TextOverflow.fade,
+                        )
+                      ),
+                    ],
+                  )
+                    ],
+                  )
+                );
+              }
+              ),
       ),
     );
   }

@@ -149,7 +149,7 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           isLoading = !isLoading;
         });
-        dynamic result = await _auth.register(emailController.text, passwordController.text);
+        dynamic result = await _auth.register(emailController.text, passwordController.text, nameController.text);
         if (result == null){
           setState(() {
         isVisible = true;
