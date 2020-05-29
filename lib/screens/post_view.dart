@@ -62,7 +62,9 @@ class _PostViewState extends State<PostView> {
                 children: <Widget>[
                    CircleAvatar(
                         radius: 20,
-                        backgroundColor: Colors.amber
+                        backgroundColor: Colors.amber,
+                        backgroundImage: widget.post.userImageUrl != 'none' ? NetworkImage(widget.post.userImageUrl) :
+                        AssetImage('assets/images/icons8-customer-64.png'),
                       ),
                       SizedBox(width: 20,),
                       Column(
@@ -88,12 +90,21 @@ class _PostViewState extends State<PostView> {
               ),
               SizedBox(height:20),
               Container(
+                width: MediaQuery.of(context).size.width,
                 child: Text(
                   widget.post.text,
                   style: TextStyle(
                     fontSize: 16
                   )
                 )
+              ),
+              SizedBox(height:20),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20)
+                ),
+                child: Image.network(widget.post.postImageUrl)
               )
           ],),
         )

@@ -1,34 +1,100 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facebook_clone/models/current_user.dart';
+import 'package:facebook_clone/models/post.dart';
 
-class PostDatabaseService{
+class PostDatabaseService {
 
-  final CollectionReference postCollection = Firestore.instance.collection('posts');
-  
+  // id has to be uid + DateTime.now() for unique records
+
+  final String id;
+  PostDatabaseService({this.id});
+
+  final CollectionReference postCollection =
+      Firestore.instance.collection('posts');
+
+  Future updatePostData({String name, String userImageUrl, String postImageUrl, int time, String uid,
+      String text, int likes, List likers}) async {
+    return await postCollection.document(id).setData({
+      //try: with every uid, get user name and imageUrl from UserCollection Stream
+      //that would make "name" and "imageUrl" fields useless
+
+      "userName": name,
+      "userImageUrl": userImageUrl,
+      "postImageUrl": postImageUrl,
+      "postId":id,
+      'userId': uid,
+      'time': time,
+      'text': text,
+      'likes': likes,
+      'likers': likers,
+    });
+  }
+
+  List<Post> _postsFromCollection(QuerySnapshot snapshot){
+    return snapshot.documents.map((doc){
+      return Post(
+        text: doc.data['text'] ?? '',
+        userName: doc.data['userName'] ?? '',
+        userId: doc.data['userId'] ?? '',
+        postId: doc.data['postId'] ?? '',
+        time: DateTime.fromMillisecondsSinceEpoch(doc.data['time']) ?? DateTime.now(),
+        likes: doc.data['likes'] ?? 0,
+        likers: doc.data['likers'] ?? [],
+        userImageUrl: doc.data['userImageUrl'] ?? 'none',
+        postImageUrl : doc.data['postImageUrl'] ?? 'none',
+
+      );
+    }).toList();
+  }
+
+   Stream<List<Post>> get posts {
+    return postCollection.snapshots().map(_postsFromCollection);
+  }
 
 }
 
+class CommentDatabaseService {
 
-class CommentDatabaseService{
+  // id has to be postId + DateTime.now() for unique records
 
-  final CollectionReference commentCollection = Firestore.instance.collection('comments');
+  final String id;
+  CommentDatabaseService({this.id});
 
+  final CollectionReference commentCollection =
+      Firestore.instance.collection('comments');
 
+   Future updateCommmentData(String name, String imageUrl, DateTime time,
+      String text) async {
+    return await commentCollection.document(id).setData({
+      'name': name,
+      'time': time,
+      'text': text,
+      'imagerl': imageUrl
+    });
+  }
 }
 
-class UserDatabaseService{
-
+class UserDatabaseService {
   final String id;
   UserDatabaseService({this.id});
 
-  final CollectionReference userCollection = Firestore.instance.collection('users');
-  Future updateUserData(String name, String imageUrl) async{
-    return await userCollection.document(id).setData(
-      {
-        "name": name,
-        "imageUrl": imageUrl
-      }
-    );
+  final CollectionReference userCollection =
+      Firestore.instance.collection('users');
+  Future updateUserData(String name, String imageUrl) async {
+    return await userCollection
+        .document(id)
+        .setData({"name": name, "imageUrl": imageUrl});
   }
-  
+
+  CurrentUser _userFromSnapshot(QuerySnapshot snap){
+      return CurrentUser(
+        name: snap.documents[0].data['name'],
+        imageUrl: snap.documents[0].data['imageUrl']
+      );
+  }
+
+  Stream<CurrentUser> get users {
+    return userCollection.snapshots().map(_userFromSnapshot);
+  }
 
 }

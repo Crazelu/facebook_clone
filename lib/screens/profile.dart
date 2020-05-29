@@ -1,14 +1,17 @@
 import 'dart:io';
 
 import 'package:facebook_clone/constants/constants.dart';
+import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/user.dart';
 import 'package:facebook_clone/screens/home_screen.dart';
+import 'package:facebook_clone/services/database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
+  
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -58,6 +61,9 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
+    var currentUser = Provider.of<CurrentUser>(context);
+    var user = Provider.of<User>(context);
+    nameController.text = currentUser.name;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -103,7 +109,7 @@ class _ProfileState extends State<Profile> {
               CircleAvatar(
                             backgroundColor: Colors.grey[200],
                             radius: 50,
-                            backgroundImage: isUploaded ? FileImage(_profilePic) :
+                            backgroundImage:  currentUser.imageUrl!= 'none'? NetworkImage(currentUser.imageUrl) :
                             AssetImage('assets/images/icons8-customer-64.png'),
                           ),
                           SizedBox(height:20),
@@ -119,6 +125,22 @@ class _ProfileState extends State<Profile> {
                         children: [
                           _textField(nameController, 'Name', nameValidator, false),
                           SizedBox(height:20),
+                          FlatButton(
+                            onPressed: (){
+                              print(_downloadUrl);
+                              if(_downloadUrl != null){
+                            UserDatabaseService(id:user.id).updateUserData(nameController.text, _downloadUrl);
+                             Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> HomeScreen()));
+                            }
+                            }, 
+                            child: Text(
+                              'Update profile',
+                              style: TextStyle(
+                                color: Colors.blue[900],
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold
+                              )
+                            ))
                         ]
                       )
                     ),
