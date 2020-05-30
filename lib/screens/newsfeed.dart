@@ -7,17 +7,21 @@ import 'package:facebook_clone/screens/post_view.dart';
 import 'package:facebook_clone/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:facebook_clone/models/time_converter.dart';
 
 class NewsFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    List<Post> posts = Provider.of<List<Post>>(context);
-    var currentUser = Provider.of<CurrentUser>(context);
+    List<Post> posts = Provider.of<List<Post>>(context) ?? [];
+    final currentUser = Provider.of<CurrentUser>(context) ?? CurrentUser(imageUrl: 'none', name:''); 
+    print('HERE: ${currentUser.name}, ${currentUser.imageUrl}');
+    print(posts);
     return Padding(
           padding: EdgeInsets.fromLTRB(10,20,10,0),
           child: Container(
+            color: Colors.white,
             child: Column(
               children: <Widget>[
                 Row(
@@ -26,14 +30,15 @@ class NewsFeed extends StatelessWidget {
                   children: <Widget>[
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: Colors.amber,
+                      backgroundColor: Colors.lightBlueAccent.withOpacity(.1),
                       backgroundImage: currentUser.imageUrl != 'none' ? NetworkImage(currentUser.imageUrl):
                       AssetImage('assets/images/icons8-customer-64.png'),
                     ),
                     StreamProvider<CurrentUser>.value(
         initialData: CurrentUser(),
-        value: UserDatabaseService().users,
+        value: UserDatabaseService(id:Provider.of<User>(context).id).users,
         child: Container(
+          color: Colors.white,
                       width: width *.7,
                       height: 50,
                       child: FlatButton(
@@ -62,12 +67,19 @@ class NewsFeed extends StatelessWidget {
                           Container(
                             height: height*.75,
                             
-                            child: ListView.builder(
+                            child: posts.length != 0 ? ListView.builder(
                               shrinkWrap: true,
                               itemCount: posts.length,
                               itemBuilder: (context, index){
-                                return _listView(context, height, width, posts.reversed.toList()[index]);
+                                return _listView(context, height, width, posts.reversed.toList()[index]) ;
                               }
+                              ) : Container(
+                                child: Center(
+                                  child: Text(
+                                    'No post to show',
+                                    style: Theme.of(context).textTheme.headline4
+                                  ),
+                                )
                               ),
                           ),
               ],
@@ -77,6 +89,8 @@ class NewsFeed extends StatelessWidget {
   }
 
   _listView(BuildContext context, double height, double width, Post post){
+    List likers = post.likers;
+    var userId = Provider.of<User>(context).id;
     return InkWell(
       onTap: (){
         Navigator.push(context, MaterialPageRoute(builder: (_)=> PostView(post)));
@@ -108,7 +122,7 @@ class NewsFeed extends StatelessWidget {
                           )
                           ),
                         Text(
-                          post.time.toString(),
+                          converter(post.time),
                           style: TextStyle(
                             color: Colors.grey
                           )
@@ -132,10 +146,11 @@ class NewsFeed extends StatelessWidget {
               height: height*.25,
               decoration: BoxDecoration(
                 image: DecorationImage(
+                  //TODO: Implement placeholder while image loads
                   image: NetworkImage(post.postImageUrl),
                   fit: BoxFit.cover
                 ),
-                color: Colors.pink,
+                color: Colors.lightBlueAccent.withOpacity(.1),
                 borderRadius: BorderRadius.circular(20)
               )
 
@@ -147,10 +162,24 @@ class NewsFeed extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     IconButton(
-                  onPressed: (){},
-                  icon: Icon(Icons.favorite_border),
+                  onPressed: (){
+                    likers.contains(userId) ? likers.remove(userId) : likers.add(userId);
+                    PostDatabaseService(id:post.postId).updatePostData(name: post.userName,
+                    userImageUrl: post.userImageUrl,
+                    postImageUrl: post.postImageUrl,
+                    time: post.time.millisecondsSinceEpoch,
+                    text: post.text,
+                    likers: likers,
+                    uid: userId
+                    );
+                  },
+                  icon: Icon( likers.contains(userId) ?
+                    Icons.favorite : Icons.favorite_border,
+                    color: Colors.red,)
                 ),
-                Text('${post.likes} likes'),
+                Text(
+                  post.likers.length == 1 ?
+                  '${post.likers.length} like' : '${post.likers.length} likes'),
                   ],),
                 
                 Container(

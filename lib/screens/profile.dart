@@ -11,7 +11,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
-  
+  final String id;
+  Profile({this.id});
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -49,6 +50,7 @@ class _ProfileState extends State<Profile> {
     StorageTaskSnapshot snap = await uploadTask.onComplete;
     setState(() {
       isUploaded = true;
+      print(isUploaded);
     });
   }
 
@@ -61,11 +63,14 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    var currentUser = Provider.of<CurrentUser>(context);
-    var user = Provider.of<User>(context);
-    nameController.text = currentUser.name;
+    final currentUser = Provider.of<CurrentUser>(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
+    nameController.text = currentUser.name ?? '';
+    isUploaded = currentUser.imageUrl != 'none';
+    print('current user name : ${currentUser.name}');
+    print('User id ${widget.id}');
+    print(_downloadUrl);
     return Scaffold(
       appBar: AppBar(
          backgroundColor: Colors.white,
@@ -109,7 +114,7 @@ class _ProfileState extends State<Profile> {
               CircleAvatar(
                             backgroundColor: Colors.grey[200],
                             radius: 50,
-                            backgroundImage:  currentUser.imageUrl!= 'none'? NetworkImage(currentUser.imageUrl) :
+                            backgroundImage: currentUser.imageUrl != 'none' ? NetworkImage(currentUser.imageUrl) : _downloadUrl != null ? NetworkImage(_downloadUrl):
                             AssetImage('assets/images/icons8-customer-64.png'),
                           ),
                           SizedBox(height:20),
@@ -129,7 +134,7 @@ class _ProfileState extends State<Profile> {
                             onPressed: (){
                               print(_downloadUrl);
                               if(_downloadUrl != null){
-                            UserDatabaseService(id:user.id).updateUserData(nameController.text, _downloadUrl);
+                            UserDatabaseService(id:widget.id).updateUserData(nameController.text, _downloadUrl);
                              Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> HomeScreen()));
                             }
                             }, 

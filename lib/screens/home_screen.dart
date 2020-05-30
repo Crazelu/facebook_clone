@@ -1,11 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:facebook_clone/models/comment.dart';
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/user.dart';
 import 'package:facebook_clone/screens/authenticate.dart';
-import 'package:facebook_clone/screens/create_post.dart';
 import 'package:facebook_clone/screens/newsfeed.dart';
-import 'package:facebook_clone/screens/post_view.dart';
 import 'package:facebook_clone/screens/profile.dart';
 import 'package:facebook_clone/services/auth.dart';
 import 'package:facebook_clone/services/database.dart';
@@ -23,22 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final AuthService _auth = AuthService();
 
-  void delay(){
-    Future.delayed(Duration(seconds: 5)).then((onValue){
-      setState(() {
-        isVisible = !isVisible;
-      });
-    });
-  }
-
   bool isVisible = false;
 
   @override
   Widget build(BuildContext context) {
-    delay();
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -84,11 +70,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: _drawer()
       ),
       body: StreamProvider<CurrentUser>.value(
-        initialData: CurrentUser(),
-        value: UserDatabaseService().users,
+        value: UserDatabaseService(id:Provider.of<User>(context).id).users,
         child: StreamProvider<List<Post>>.value(
-          initialData: [],
-          value: PostDatabaseService().posts,
+          value: PostDatabaseService(id:Provider.of<User>(context).id).posts,
           child: NewsFeed()
         ),
       ),
@@ -99,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _drawer() {
+    final userId = Provider.of<User>(context).id;
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return SafeArea(
@@ -115,12 +100,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> 
                 StreamProvider<CurrentUser>.value(
         initialData: CurrentUser(),
-        value: UserDatabaseService().users,
-        child: StreamProvider<User>.value(
-          value: AuthService().user,
-          child: Profile(),
+        value: UserDatabaseService(id:userId).users,
+        child:Profile(id:userId),
         )
-        )));
+        ));
               },
               child: Text(
                 'Profile',
@@ -133,7 +116,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             SizedBox(height:20),
             InkWell(
-              onTap: ()=> _auth.signOut(),
+              onTap: (){ 
+                _auth.signOut();
+                Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> Authenticate()));
+              },
               child: Text(
                 'Logout',
                 style: TextStyle(

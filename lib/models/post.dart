@@ -4,7 +4,6 @@ class Post {
   String postId;
   String userId;
   DateTime time;
-  int likes;
   String userImageUrl;
   String postImageUrl;
   List likers;
@@ -15,7 +14,6 @@ class Post {
       this.postId,
       this.userId,
       this.time,
-      this.likes,
       this.likers,
       this.userImageUrl,
       this.postImageUrl});

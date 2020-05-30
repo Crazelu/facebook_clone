@@ -11,7 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 class NewPost extends StatefulWidget {
-  String id;
+  final String id;
   NewPost({this.id});
   @override
   _NewPostState createState() => _NewPostState();
@@ -21,11 +21,13 @@ class _NewPostState extends State<NewPost> {
 
     final TextEditingController textController = TextEditingController();
  String _imageUrl;
+ String errorMessage;
   File _image;
   String _downloadUrl;
   StorageReference _reference;
   final DateTime _time = DateTime.now();
   bool isUploaded = false;
+  bool isVisible = false;
 
   Future getImage(bool isCamera) async{
     File image;
@@ -43,7 +45,10 @@ class _NewPostState extends State<NewPost> {
         downloadFromCloud();
       }
       else{
-        print('Error');
+        setState((){
+          errorMessage = 'Error uploading image. Try again.';
+          isVisible = true;
+        });
       }
     });
   }
@@ -66,6 +71,7 @@ class _NewPostState extends State<NewPost> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserImage = Provider.of<CurrentUser>(context).imageUrl ?? 'none';
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -95,7 +101,7 @@ class _NewPostState extends State<NewPost> {
                 var user = Provider.of<User>(context);
                 var current = Provider.of<CurrentUser>(context);
                 PostDatabaseService(id:user.id+DateTime.now().toString()).updatePostData(userImageUrl: current.imageUrl, postImageUrl: _downloadUrl ?? 'none',
-                likes: 0, likers: [], text: textController.text ?? '', uid: user.id, name: current.name,
+                likers: [], text: textController.text ?? '', uid: user.id, name: current.name,
                 time: DateTime.now().millisecondsSinceEpoch
                 );
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> HomeScreen()));
@@ -107,13 +113,13 @@ class _NewPostState extends State<NewPost> {
         ),
         body: Material(
           color: Colors.white,
-          child: _postView(context)
+          child: _postView(context, currentUserImage)
         ),
       );
 
   }
 
-  _postView(BuildContext context) {
+  _postView(BuildContext context, String image) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
     return SingleChildScrollView(
@@ -130,7 +136,9 @@ class _NewPostState extends State<NewPost> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 25,
-                  backgroundColor: Colors.amber
+                  backgroundColor: Colors.amber,
+                  backgroundImage: image != 'none' ? NetworkImage(image): 
+                  AssetImage('assets/images/icons8-customer-64.png'),
                 ),
                 Container(
                   width: width * .7,
@@ -159,7 +167,17 @@ class _NewPostState extends State<NewPost> {
                   )
               ],
             ),
-            _image == null ? Container(): _downloadUrl == null ? CircularProgressIndicator():
+            SizedBox(height:15),
+            Visibility(
+              visible: isVisible,
+              child: Text(
+                errorMessage,
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16
+                )
+              )
+            ),
             Container(
               height: height * .4,
               width: width,

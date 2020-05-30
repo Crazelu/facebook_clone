@@ -1,10 +1,11 @@
 import 'package:facebook_clone/models/post.dart';
 import 'package:facebook_clone/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:facebook_clone/models/time_converter.dart';
 
 class PostView extends StatefulWidget {
 
-  Post post;
+  final Post post;
   PostView(this.post);
 
   @override
@@ -62,7 +63,7 @@ class _PostViewState extends State<PostView> {
                 children: <Widget>[
                    CircleAvatar(
                         radius: 20,
-                        backgroundColor: Colors.amber,
+                        backgroundColor: Colors.lightBlueAccent.withOpacity(.1),
                         backgroundImage: widget.post.userImageUrl != 'none' ? NetworkImage(widget.post.userImageUrl) :
                         AssetImage('assets/images/icons8-customer-64.png'),
                       ),
@@ -79,7 +80,7 @@ class _PostViewState extends State<PostView> {
                             )
                             ),
                           Text(
-                            widget.post.time.toString(),
+                            converter(widget.post.time),
                             style: TextStyle(
                               color: Colors.grey
                             )
@@ -102,7 +103,6 @@ class _PostViewState extends State<PostView> {
               Container(
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20)
                 ),
                 child: Image.network(widget.post.postImageUrl)
               )

@@ -13,7 +13,7 @@ class PostDatabaseService {
       Firestore.instance.collection('posts');
 
   Future updatePostData({String name, String userImageUrl, String postImageUrl, int time, String uid,
-      String text, int likes, List likers}) async {
+      String text, List likers}) async {
     return await postCollection.document(id).setData({
       //try: with every uid, get user name and imageUrl from UserCollection Stream
       //that would make "name" and "imageUrl" fields useless
@@ -25,7 +25,6 @@ class PostDatabaseService {
       'userId': uid,
       'time': time,
       'text': text,
-      'likes': likes,
       'likers': likers,
     });
   }
@@ -37,8 +36,7 @@ class PostDatabaseService {
         userName: doc.data['userName'] ?? '',
         userId: doc.data['userId'] ?? '',
         postId: doc.data['postId'] ?? '',
-        time: DateTime.fromMillisecondsSinceEpoch(doc.data['time']) ?? DateTime.now(),
-        likes: doc.data['likes'] ?? 0,
+        time: DateTime.fromMillisecondsSinceEpoch(doc.data['time']) ?? DateTime.now().millisecondsSinceEpoch,
         likers: doc.data['likers'] ?? [],
         userImageUrl: doc.data['userImageUrl'] ?? 'none',
         postImageUrl : doc.data['postImageUrl'] ?? 'none',
@@ -63,7 +61,7 @@ class CommentDatabaseService {
   final CollectionReference commentCollection =
       Firestore.instance.collection('comments');
 
-   Future updateCommmentData(String name, String imageUrl, DateTime time,
+   Future updateCommmentData(String name, String imageUrl, int time,
       String text) async {
     return await commentCollection.document(id).setData({
       'name': name,
@@ -86,15 +84,15 @@ class UserDatabaseService {
         .setData({"name": name, "imageUrl": imageUrl});
   }
 
-  CurrentUser _userFromSnapshot(QuerySnapshot snap){
+  CurrentUser _userFromSnapshot(DocumentSnapshot snap){
       return CurrentUser(
-        name: snap.documents[0].data['name'],
-        imageUrl: snap.documents[0].data['imageUrl']
+        name: snap.data['name'],
+        imageUrl: snap.data['imageUrl']
       );
   }
 
   Stream<CurrentUser> get users {
-    return userCollection.snapshots().map(_userFromSnapshot);
+    return userCollection.document(id).snapshots().map(_userFromSnapshot);
   }
 
 }
