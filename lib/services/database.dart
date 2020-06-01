@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:facebook_clone/models/comment.dart';
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/post.dart';
 
@@ -64,12 +65,30 @@ class CommentDatabaseService {
    Future updateCommmentData(String name, String imageUrl, int time,
       String text) async {
     return await commentCollection.document(id).setData({
-      'name': name,
+      'userName': name,
       'time': time,
       'text': text,
-      'imagerl': imageUrl
+      'imageUrl': imageUrl
     });
   }
+
+  Stream<List<Comment>> get comments {
+    return commentCollection.snapshots().map(_commentsFromCollection);
+  }
+
+ List<Comment> _commentsFromCollection(QuerySnapshot snapshot){
+    return snapshot.documents.map((doc){
+      return Comment(
+        text: doc.data['text'] ?? '',
+        userName: doc.data['userName'] ?? '',
+        time: DateTime.fromMillisecondsSinceEpoch(doc.data['time']) ?? DateTime.now().millisecondsSinceEpoch,
+        imageUrl: doc.data['imageUrl'] ?? 'none',
+
+
+      );
+    }).toList();
+  }
+
 }
 
 class UserDatabaseService {

@@ -100,12 +100,12 @@ class _PostViewState extends State<PostView> {
                 )
               ),
               SizedBox(height:20),
-              Container(
+              widget.post.postImageUrl != 'none' ? Container(
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                 ),
                 child: Image.network(widget.post.postImageUrl)
-              )
+              ) : Container()
           ],),
         )
       )

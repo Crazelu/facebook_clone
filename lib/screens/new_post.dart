@@ -21,7 +21,7 @@ class _NewPostState extends State<NewPost> {
 
     final TextEditingController textController = TextEditingController();
  String _imageUrl;
- String errorMessage;
+ String errorMessage = '';
   File _image;
   String _downloadUrl;
   StorageReference _reference;
@@ -44,13 +44,9 @@ class _NewPostState extends State<NewPost> {
       if (isUploaded){
         downloadFromCloud();
       }
-      else{
-        setState((){
-          errorMessage = 'Error uploading image. Try again.';
-          isVisible = true;
-        });
-      }
+      isVisible = false;
     });
+    
   }
 
   Future uploadToCloud() async{
@@ -71,6 +67,7 @@ class _NewPostState extends State<NewPost> {
 
   @override
   Widget build(BuildContext context) {
+    print('isUploaded: $isUploaded');
     final currentUserImage = Provider.of<CurrentUser>(context).imageUrl ?? 'none';
     return Scaffold(
         backgroundColor: Colors.white,
@@ -88,16 +85,17 @@ class _NewPostState extends State<NewPost> {
             IconButton(
               color: Colors.grey,
             onPressed: (){
-
-              if(textController.text.isEmpty && _downloadUrl == null){
-                //Alert user to post an image or text
+              if(isUploaded && _downloadUrl == null){
+                setState(() {
+                  errorMessage = 'Error uploading image, try again';
+                  isVisible = true;
+                });
               }
+
+              // if(textController.text.isEmpty && _downloadUrl == null){
+              //   //Alert user to post an image or text
+              // }
               else{
-                //upload image to firebase storage
-
-                //if upload is successful, download image
-
-                //Push data to firebase database
                 var user = Provider.of<User>(context);
                 var current = Provider.of<CurrentUser>(context);
                 PostDatabaseService(id:user.id+DateTime.now().toString()).updatePostData(userImageUrl: current.imageUrl, postImageUrl: _downloadUrl ?? 'none',
@@ -136,7 +134,7 @@ class _NewPostState extends State<NewPost> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 25,
-                  backgroundColor: Colors.amber,
+                  backgroundColor: Colors.lightBlueAccent.withOpacity(.1),
                   backgroundImage: image != 'none' ? NetworkImage(image): 
                   AssetImage('assets/images/icons8-customer-64.png'),
                 ),
@@ -178,7 +176,8 @@ class _NewPostState extends State<NewPost> {
                 )
               )
             ),
-            Container(
+            SizedBox(height:15),
+           _image== null ? Container() : Container(
               height: height * .4,
               width: width,
               decoration: BoxDecoration(
@@ -230,7 +229,7 @@ class _NewPostState extends State<NewPost> {
                 onPressed: (){
                   getImage(false);
                   Navigator.pop(context);
-                }
+                          }
                 ),
             ],
           ),

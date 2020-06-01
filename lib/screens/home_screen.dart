@@ -50,8 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FlatButton(
                 color: Colors.blueGrey[800],
                 onPressed: (){
-                  _auth.signOut();
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> Authenticate()));
                 }, 
                 child: Text(
                   'Clone Mode',
