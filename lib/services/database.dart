@@ -63,17 +63,18 @@ class CommentDatabaseService {
       Firestore.instance.collection('comments');
 
    Future updateCommmentData(String name, String imageUrl, int time,
-      String text) async {
-    return await commentCollection.document(id).setData({
+      String text,) async {
+    return await commentCollection.document(id+DateTime.now().toString()).setData({
       'userName': name,
       'time': time,
       'text': text,
-      'imageUrl': imageUrl
+      'imageUrl': imageUrl,
+      'postId': id
     });
   }
 
   Stream<List<Comment>> get comments {
-    return commentCollection.snapshots().map(_commentsFromCollection);
+    return commentCollection.where('postId', isEqualTo: id).snapshots().map(_commentsFromCollection);
   }
 
  List<Comment> _commentsFromCollection(QuerySnapshot snapshot){
@@ -83,6 +84,12 @@ class CommentDatabaseService {
         userName: doc.data['userName'] ?? '',
         time: DateTime.fromMillisecondsSinceEpoch(doc.data['time']) ?? DateTime.now().millisecondsSinceEpoch,
         imageUrl: doc.data['imageUrl'] ?? 'none',
+        postId: doc.data['postId'] ?? ''
+
+        // text: doc.data['comments'].text ?? '',
+        // userName: doc.data['comments'].name ?? '',
+        // time: DateTime.fromMillisecondsSinceEpoch(doc.data['comments'].time) ?? DateTime.now().millisecondsSinceEpoch,
+        // imageUrl: doc.data['comments'].imageUrl ?? 'none',
 
 
       );

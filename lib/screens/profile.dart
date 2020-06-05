@@ -12,7 +12,8 @@ import 'package:provider/provider.dart';
 
 class Profile extends StatefulWidget {
   final String id;
-  Profile({this.id});
+  final CurrentUser currentUser;
+  Profile({this.id, this.currentUser});
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -63,15 +64,15 @@ class _ProfileState extends State<Profile> {
 
   @override
   Widget build(BuildContext context) {
-    final currentUser = Provider.of<CurrentUser>(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    nameController.text = currentUser.name ?? '';
-    isUploaded = currentUser.imageUrl != 'none';
-    print('current user name : ${currentUser.name}');
+    nameController.text = widget.currentUser.name ?? '';
+    isUploaded = widget.currentUser.imageUrl != 'none';
+    print('current user name : ${widget.currentUser.name}');
     print('User id ${widget.id}');
     print(_downloadUrl);
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
          backgroundColor: Colors.white,
         elevation: 0,
@@ -79,8 +80,8 @@ class _ProfileState extends State<Profile> {
         title: Text(
                 'Facebook',
                 style: TextStyle(
-                  letterSpacing: .5,
-                  color: Colors.indigoAccent,
+                  letterSpacing: .2,
+                  color: Colors.blue[900],
                   fontWeight: FontWeight.bold,
                   fontSize:20
                 )
@@ -108,18 +109,24 @@ class _ProfileState extends State<Profile> {
         onWillPop: ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> HomeScreen())),
         child: Padding(
           padding: EdgeInsets.fromLTRB(20,20,20,0),
-          child: Column(
+          child: 
+          Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                             backgroundColor: Colors.grey[200],
                             radius: 50,
-                            backgroundImage: currentUser.imageUrl != 'none' ? NetworkImage(currentUser.imageUrl) : _downloadUrl != null ? NetworkImage(_downloadUrl):
+                            backgroundImage: widget.currentUser.imageUrl != 'none' && _downloadUrl == null ? NetworkImage(widget.currentUser.imageUrl) : _downloadUrl != null ? NetworkImage(_downloadUrl):
                             AssetImage('assets/images/icons8-customer-64.png'),
                           ),
                           SizedBox(height:20),
                           FlatButton.icon(
-                            onPressed: ()=> _bottomSheet(context, height, width), 
+                            onPressed: () {
+                              setState((){
+                                _downloadUrl = null;
+                              });
+                              _bottomSheet(context, height, width);
+                            }, 
                             icon: Icon(Icons.add_photo_alternate), 
                             label: Text('Upload image')),
                             SizedBox(height:20),

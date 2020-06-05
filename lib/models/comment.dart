@@ -4,7 +4,8 @@ class Comment{
   String userName;
   String imageUrl;
   DateTime time;
+  String postId;
 
-  Comment({this.text, this.userName, this.imageUrl, this.time});
+  Comment({this.text, this.userName, this.imageUrl, this.time, this.postId});
 
 }

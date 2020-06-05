@@ -15,7 +15,7 @@ class NewsFeed extends StatelessWidget {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    List<Post> posts = Provider.of<List<Post>>(context) ?? [];
+    List<Post> posts = Provider.of<List<Post>>(context);
     final currentUser = Provider.of<CurrentUser>(context) ??
         CurrentUser(imageUrl: 'none', name: '');
     return feed(context, currentUser, posts, width, height);
@@ -182,8 +182,8 @@ class NewsFeed extends StatelessWidget {
                             .users,
                     child: Container(
                         color: Colors.white,
-                        width: width * .7,
-                        height: 50,
+                        width: width * .75,
+                        height: 45,
                         child: FlatButton(
                           onPressed: () {
                             Navigator.push(
@@ -204,7 +204,13 @@ class NewsFeed extends StatelessWidget {
               SizedBox(height: 20),
               Container(
                 height: height * .75,
-                child: posts.length != 0
+                child: posts == null ? Container(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.blue[700]
+                    ),
+                  )
+                ) : posts.length != 0
                     ? ListView.builder(
                         shrinkWrap: true,
                         itemCount: posts.length,

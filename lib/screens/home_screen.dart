@@ -1,9 +1,7 @@
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/user.dart';
-import 'package:facebook_clone/screens/authenticate.dart';
+import 'package:facebook_clone/screens/drawer.dart';
 import 'package:facebook_clone/screens/newsfeed.dart';
-import 'package:facebook_clone/screens/profile.dart';
-import 'package:facebook_clone/services/auth.dart';
 import 'package:facebook_clone/services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:facebook_clone/models/post.dart';
@@ -17,29 +15,19 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  final AuthService _auth = AuthService();
-
-  bool isVisible = false;
-
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.menu), 
-          color: Colors.blue[900],
-          onPressed: () =>openDrawer(context),
-         
-          ),
         
         title: Text(
                 'Facebook',
                 style: TextStyle(
-                  letterSpacing: .5,
-                  color: Colors.indigoAccent,
+                  letterSpacing: .2,
+                  color: Colors.blue[700],
                   fontWeight: FontWeight.bold,
                   fontSize:20
                 )
@@ -65,7 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: Drawer(
-        child: _drawer()
+        child:StreamProvider<CurrentUser>.value(
+        value: UserDatabaseService(id:Provider.of<User>(context).id).users,
+        child: AppDrawer()
+        )
       ),
       body: StreamProvider<CurrentUser>.value(
         value: UserDatabaseService(id:Provider.of<User>(context).id).users,
@@ -78,63 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
       
         
     );
-  }
-
-  _drawer() {
-    final userId = Provider.of<User>(context).id;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return SafeArea(
-      child: Container(
-        margin: EdgeInsets.symmetric(vertical:20, horizontal:20),
-        color: Colors.white24,
-        width: width * .4,
-        height: height,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            InkWell(
-              onTap: (){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> 
-                StreamProvider<CurrentUser>.value(
-        initialData: CurrentUser(),
-        value: UserDatabaseService(id:userId).users,
-        child:Profile(id:userId),
-        )
-        ));
-              },
-              child: Text(
-                'Profile',
-                style: TextStyle(
-                  color: Colors.blue[600],
-                  fontSize:22,
-                  fontWeight: FontWeight.bold
-                )
-              )
-            ),
-            SizedBox(height:20),
-            InkWell(
-              onTap: (){ 
-                _auth.signOut();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> Authenticate()));
-              },
-              child: Text(
-                'Logout',
-                style: TextStyle(
-                  color: Colors.blue[600],
-                  fontSize:22,
-                  fontWeight: FontWeight.bold
-                )
-              )
-            ),
-
-          ],)
-      ),
-    );
-  }
-
-  openDrawer(BuildContext context) {
-    Scaffold.of(context).openDrawer();
   }
 
 }

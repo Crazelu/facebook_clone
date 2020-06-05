@@ -37,8 +37,8 @@ class _SignInState extends State<SignIn> {
               Text(
                 'Facebook',
                 style: TextStyle(
-                  letterSpacing: .5,
-                  color: Colors.indigoAccent,
+                  letterSpacing: .2,
+                  color: Colors.blue[900],
                   fontWeight: FontWeight.bold,
                   fontSize:20
                 )

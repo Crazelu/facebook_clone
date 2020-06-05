@@ -19,6 +19,7 @@ class _PostViewState extends State<PostView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -37,9 +38,7 @@ class _PostViewState extends State<PostView> {
             padding: const EdgeInsets.all(8),
             child: FlatButton(
                 color: Colors.blueGrey[800],
-                onPressed: (){
-                  _auth.signOut();
-                }, 
+                onPressed: (){}, 
                 child: Text(
                   'Clone Mode',
                   style: TextStyle(
