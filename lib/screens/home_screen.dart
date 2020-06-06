@@ -1,5 +1,6 @@
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/user.dart';
+import 'package:facebook_clone/navigation/navigation_animation/animations.dart';
 import 'package:facebook_clone/screens/drawer.dart';
 import 'package:facebook_clone/screens/newsfeed.dart';
 import 'package:facebook_clone/services/database.dart';
@@ -8,6 +9,8 @@ import 'package:facebook_clone/models/post.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
+  final bool isForward;
+  HomeScreen({this.isForward});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -22,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        
+
         title: Text(
                 'Facebook',
                 style: TextStyle(
@@ -38,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: FlatButton(
                 color: Colors.blueGrey[800],
                 onPressed: (){
-                }, 
+                },
                 child: Text(
                   'Clone Mode',
                   style: TextStyle(
@@ -62,12 +65,12 @@ class _HomeScreenState extends State<HomeScreen> {
         value: UserDatabaseService(id:Provider.of<User>(context).id).users,
         child: StreamProvider<List<Post>>.value(
           value: PostDatabaseService(id:Provider.of<User>(context).id).posts,
-          child: NewsFeed()
+          child: widget.isForward ? ForwardAnimation(child: NewsFeed()) : BackwardAnimation(child: NewsFeed())
         ),
       ),
 
-      
-        
+
+
     );
   }
 

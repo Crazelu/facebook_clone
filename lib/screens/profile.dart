@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:facebook_clone/navigation/app_navigation.dart';
 
 class Profile extends StatefulWidget {
   final String id;
@@ -68,9 +69,6 @@ class _ProfileState extends State<Profile> {
     double height = MediaQuery.of(context).size.height;
     nameController.text = widget.currentUser.name ?? '';
     isUploaded = widget.currentUser.imageUrl != 'none';
-    print('current user name : ${widget.currentUser.name}');
-    print('User id ${widget.id}');
-    print(_downloadUrl);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -81,7 +79,7 @@ class _ProfileState extends State<Profile> {
                 'Facebook',
                 style: TextStyle(
                   letterSpacing: .2,
-                  color: Colors.blue[900],
+                  color: Colors.blue[700],
                   fontWeight: FontWeight.bold,
                   fontSize:20
                 )
@@ -106,7 +104,7 @@ class _ProfileState extends State<Profile> {
         ],
       ),
       body: WillPopScope(
-        onWillPop: ()=> Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> HomeScreen())),
+        onWillPop: ()=> Navigation().pushFrom(context, HomeScreen(isForward: false)),
         child: Padding(
           padding: EdgeInsets.fromLTRB(20,20,20,0),
           child: 

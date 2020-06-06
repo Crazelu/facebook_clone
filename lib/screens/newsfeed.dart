@@ -2,6 +2,7 @@ import 'package:facebook_clone/models/comment.dart';
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/post.dart';
 import 'package:facebook_clone/models/user.dart';
+import 'package:facebook_clone/navigation/app_navigation.dart';
 import 'package:facebook_clone/screens/comments_list.dart';
 import 'package:facebook_clone/screens/create_post.dart';
 import 'package:facebook_clone/screens/post_view.dart';
@@ -26,8 +27,7 @@ class NewsFeed extends StatelessWidget {
         var userId = Provider.of<User>(context).id;
         return InkWell(
           onTap: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (_) => PostView(post)));
+            Navigation().pushToAndReplace(context, PostView(post));
           },
           child: Container(
               color: Colors.white,
@@ -186,11 +186,8 @@ class NewsFeed extends StatelessWidget {
                         height: 45,
                         child: FlatButton(
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => CreatePost(
-                                        id: Provider.of<User>(context).id)));
+                            Navigation().pushTo(context, CreatePost(
+                                        id: Provider.of<User>(context).id));
                           },
                           child: Text("What's on your mind?",
                               style: TextStyle(color: Colors.grey[400])),

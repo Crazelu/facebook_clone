@@ -1,4 +1,5 @@
 import 'package:facebook_clone/models/user.dart';
+import 'package:facebook_clone/navigation/navigation_animation/animations.dart';
 import 'package:facebook_clone/screens/home_screen.dart';
 import 'package:facebook_clone/screens/landing_page.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,6 @@ class Authenticate extends StatelessWidget {
     if (user == null){
       return LandingPage();
     }
-    return HomeScreen();
+    return ForwardAnimation(child: HomeScreen(isForward: true));
   }
 }   

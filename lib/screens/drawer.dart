@@ -1,6 +1,7 @@
+import 'package:facebook_clone/main.dart';
 import 'package:facebook_clone/models/current_user.dart';
 import 'package:facebook_clone/models/user.dart';
-import 'package:facebook_clone/screens/authenticate.dart';
+import 'package:facebook_clone/navigation/app_navigation.dart';
 import 'package:facebook_clone/screens/profile.dart';
 import 'package:facebook_clone/services/auth.dart';
 import 'package:facebook_clone/services/database.dart';
@@ -26,12 +27,10 @@ class AppDrawer extends StatelessWidget {
           children: <Widget>[
             InkWell(
               onTap: (){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_)=> 
-                StreamProvider<CurrentUser>.value(
+                Navigation().pushToAndReplace(context, StreamProvider<CurrentUser>.value(
         initialData: CurrentUser(),
         value: UserDatabaseService(id:userId).users,
         child:Profile(id:userId, currentUser: currentUser),
-        )
         ));
               },
               child: Text(
@@ -45,9 +44,9 @@ class AppDrawer extends StatelessWidget {
             ),
             SizedBox(height:20),
             InkWell(
-              onTap: (){ 
-                _auth.signOut();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder:(_)=> Authenticate()));
+              onTap: ()async{
+                await _auth.signOut();
+                Navigation().pushToAndReplace(context, MyApp());
               },
               child: Text(
                 'Logout',

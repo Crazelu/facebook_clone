@@ -51,22 +51,33 @@ class _CommentsListState extends State<CommentsList> {
                       SizedBox(
                         height: 20,
                       ),
-                      TextField(
-                        controller: commentController,
-                          decoration: InputDecoration(
-                              hintText: 'Write comment...',
-                              hintStyle: TextStyle(fontSize: 16),
-                              suffix: IconButton(
-                                icon: Icon(Icons.send),
-                                color: Colors.lightBlueAccent,
-                                onPressed: () =>
-                                    CommentDatabaseService(id: widget.postId)
-                                        .updateCommmentData(
-                                            widget.currentUser.name,
-                                            widget.currentUser.imageUrl,
-                                            DateTime.now().millisecondsSinceEpoch,
-                                            commentController.text),
-                              )))
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            width: MediaQuery.of(context).size.width *.7,
+                            child: TextField(
+                                controller: commentController,
+                                decoration: InputDecoration(
+                                  hintText: 'Write comment...',
+                                  hintStyle: TextStyle(fontSize: 16),)),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.send),
+                              color: Colors.lightBlueAccent,
+                              onPressed: () {
+                                if(commentController.text.isNotEmpty){
+                                  CommentDatabaseService(id: widget.postId)
+                                      .updateCommmentData(
+                                      widget.currentUser.name,
+                                      widget.currentUser.imageUrl,
+                                      DateTime.now().millisecondsSinceEpoch,
+                                      commentController.text);
+                                }
+                                commentController.clear();                                      }
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -104,7 +115,7 @@ class _CommentsListState extends State<CommentsList> {
                                                       'assets/images/icons8-customer-64.png'),
                                             ),
                                             SizedBox(
-                                              width: 20,
+                                              width: 15,
                                             ),
                                             Row(
                                               mainAxisAlignment:

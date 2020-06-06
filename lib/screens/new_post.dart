@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:facebook_clone/navigation/app_navigation.dart';
 
 class NewPost extends StatefulWidget {
   final String id;
@@ -76,7 +77,7 @@ class _NewPostState extends State<NewPost> {
         leading: IconButton(
             color: Colors.blue[900],
             onPressed: () {
-              Navigator.pop(context);
+              Navigation().pushFrom(context, HomeScreen(isForward:false));
             },
             icon: Icon(Icons.replay)),
         actions: <Widget>[
@@ -91,67 +92,73 @@ class _NewPostState extends State<NewPost> {
   _postView(BuildContext context, String image) {
     double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
-    return SingleChildScrollView(
-      child: Container(
-          margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
-          height: height,
-          width: width,
-          color: Colors.white,
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.lightBlueAccent.withOpacity(.1),
-                    backgroundImage: image != 'none'
-                        ? NetworkImage(image)
-                        : AssetImage('assets/images/icons8-customer-64.png'),
-                  ),
-                  Container(
-                      width: width * .75,
-                      height: height * .3,
-                      child: TextField(
-                          controller: textController,
-                          maxLines: 20,
-                          decoration: postDecoration.copyWith(
-                              hintText: 'Write something...')))
-                ],
-              ),
-              SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.camera_alt),
-                    onPressed: () {
-                      _bottomSheet(context, height, width);
-                    },
-                    iconSize: 40,
-                    color: Colors.grey,
-                  )
-                ],
-              ),
-              SizedBox(height: 15),
-              Visibility(
-                  visible: isVisible,
-                  child: Text(errorMessage,
-                      style: TextStyle(color: Colors.red, fontSize: 16))),
-              SizedBox(height: 15),
-              _image == null
-                  ? Container()
-                  : Container(
-                      height: height * .4,
-                      width: width,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          image: DecorationImage(
-                              fit: BoxFit.cover, image: FileImage(_image))),
+    return WillPopScope(
+      onWillPop: (){
+        Navigation().pushFrom(context, HomeScreen(isForward:false));
+        return Future.value(false);
+      },
+      child: SingleChildScrollView(
+        child: Container(
+            margin: EdgeInsets.fromLTRB(20, 20, 20, 0),
+            height: height,
+            width: width,
+            color: Colors.white,
+            child: Column(
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    CircleAvatar(
+                      radius: 20,
+                      backgroundColor: Colors.lightBlueAccent.withOpacity(.1),
+                      backgroundImage: image != 'none'
+                          ? NetworkImage(image)
+                          : AssetImage('assets/images/icons8-customer-64.png'),
+                    ),
+                    Container(
+                        width: width * .75,
+                        height: height * .3,
+                        child: TextField(
+                            controller: textController,
+                            maxLines: 20,
+                            decoration: postDecoration.copyWith(
+                                hintText: 'Write something...')))
+                  ],
+                ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.camera_alt),
+                      onPressed: () {
+                        _bottomSheet(context, height, width);
+                      },
+                      iconSize: 40,
+                      color: Colors.grey,
                     )
-            ],
-          )),
+                  ],
+                ),
+                SizedBox(height: 15),
+                Visibility(
+                    visible: isVisible,
+                    child: Text(errorMessage,
+                        style: TextStyle(color: Colors.red, fontSize: 16))),
+                SizedBox(height: 15),
+                _image == null
+                    ? Container()
+                    : Container(
+                        height: height * .4,
+                        width: width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            image: DecorationImage(
+                                fit: BoxFit.cover, image: FileImage(_image))),
+                      )
+              ],
+            )),
+      ),
     );
   }
 
@@ -218,6 +225,32 @@ class _NewPostState extends State<NewPost> {
                   downloadFromCloud();
                 }
 
+                if (textController.text.isEmpty && _downloadUrl == null) {
+                  showDialog(
+                      context: context,
+                      child: Center(
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal:20),
+                          height: 50,
+                          color: Colors.blue[700],
+                          child: Center(
+                            child: Text(
+                                'Post cannot be empty',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    decoration: TextDecoration.none,
+                                    color: Colors.white
+                                )
+                            ),
+                          ),
+                        ),
+                      ));
+                  return 0;
+                  //Alert user to post an image or text
+
+                }
+
                 if (!isUploaded || _downloadUrl == null) {
                   setState(() {
                     errorMessage = 'Error uploading image, try again';
@@ -226,31 +259,7 @@ class _NewPostState extends State<NewPost> {
                   return 0;
                 }
 
-                if (textController.text.isEmpty && _downloadUrl == null) {
-                  showDialog(
-                    context: context,
-                      child: Center(
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal:20),
-                          height: 50,
-                          color: Colors.blue[700],
-                          child: Center(
-                            child: Text(
-                              'Post cannot be empty',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                decoration: TextDecoration.none,
-                                color: Colors.white
-                              )
-                              ),
-                          ),
-                        ),
-                      ));
-                        return 0;
-                  //Alert user to post an image or text
-                  
-                } 
+
               
 
                 else {
